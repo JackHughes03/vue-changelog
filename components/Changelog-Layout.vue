@@ -5,7 +5,7 @@
                 <a class="flex items-center gap-2" href="#">
                     <NuxtLogo />
                     Vue.js 
-                    <span class="text-blue-400">Changelog</span>
+                    <span class="text-green-400">Changelog</span>
                 </a>
                 
                 <a href="https://github.com/JackHughes03/vue-changelog/tree/main" target="_blank" rel="noopener noreferrer" class="text-blue-400 w-10">
@@ -17,7 +17,7 @@
         <main class="bg-black/95 p-10 h-full text-white w-full">
             <section class="flex flex-col mx-auto max-w-4xl w-full">
                 <h1 class="text-3xl">
-                    <span class="text-blue-400">Vue</span>
+                    <span class="text-green-400">Vue</span>
                     releases 
                 </h1>
                 
