@@ -17,7 +17,7 @@ $ npm run start
 $ npm run generate
 ```
 
-## When working on this branch
+## To start
 Be sure to create a .env file in the root directory with your github personal access token inside like so:
 
 ```javascript
