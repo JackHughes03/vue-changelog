@@ -70,49 +70,49 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const GITHUB_TOKEN = process.env.TOKEN
-const releases = ref([])
-const expanded = ref([])
+const GITHUB_TOKEN = process.env.TOKEN;
+const releases = ref([]);
+const expanded = ref([]);
 
 async function fetchReleases() {
-  const apiUrl = 'https://api.github.com/repos/vuejs/core/releases'
+  const apiUrl = "https://api.github.com/repos/vuejs/core/releases";
 
   try {
     const response = await fetch(apiUrl, {
       headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
-      },
-    })
+        Authorization: `token ${GITHUB_TOKEN}`
+      }
+    });
 
     if (!response.ok) {
-      throw new Error(`Error: ${response.status}`)
+      throw new Error(`Error: ${response.status}`);
     }
 
-    const releasesData = await response.json()
+    const releasesData = await response.json();
     releases.value = releasesData.map((releaseData) => ({
       title: releaseData.name,
       description: releaseData.body,
-      date: releaseData.published_at,
-    }))
+      date: releaseData.published_at
+    }));
   } catch (error) {
-    console.error('Failed to fetch Vue.js releases:', error)
+    console.error("Failed to fetch Vue.js releases:", error);
   }
 }
 
 function formatReleaseDate(dateString) {
-  const date = new Date(dateString)
-  const options = { year: 'numeric', month: 'long', day: 'numeric' }
-  return date.toLocaleDateString(undefined, options)
+  const date = new Date(dateString);
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  return date.toLocaleDateString(undefined, options);
 }
 
 function toggleExpanded(index) {
-  const expandIcon = document.querySelectorAll('.expandicon')[index]
+  const expandIcon = document.querySelectorAll(".expandicon")[index];
 
-  expandIcon.classList.toggle('rotate-180')
-  expanded.value[index] = !expanded.value[index]
+  expandIcon.classList.toggle("rotate-180");
+  expanded.value[index] = !expanded.value[index];
 }
 
-fetchReleases()
+fetchReleases();
 </script>
