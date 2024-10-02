@@ -1,9 +1,8 @@
 <template>
-    <section class="h-full"> <!-- Div or section tags required by Nuxt to wrap the entire component -->
+    <section class="h-full">
         <header>
             <nav class="w-full py-4 px-7 text-white bg-black/95 flex justify-between items-center border-b-[1px] border-white/20">
                 <a class="flex items-center gap-2" href="#">
-                    <NuxtLogo />
                     Vue.js 
                     <span class="text-green-400">Changelog</span>
                 </a>
@@ -60,7 +59,7 @@ const GITHUB_TOKEN = process.env.TOKEN;
 const releases = ref([]);
 const expanded = ref([]);
 
-const fetchReleases = async () => {
+async function fetchReleases() {
     const apiUrl = "https://api.github.com/repos/vuejs/core/releases";
     
     try {
@@ -83,15 +82,15 @@ const fetchReleases = async () => {
     } catch (error) {
         console.error("Failed to fetch Vue.js releases:", error);
     }
-};
-const formatReleaseDate = (dateString) => {
+}
+
+function formatReleaseDate (dateString) {
     const date = new Date(dateString);
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString(undefined, options);
-};
+}
 
-
-const toggleExpanded = (index) => {
+function toggleExpanded (index) {
     const expandIcon = document.querySelectorAll('.expandicon')[index];
     
     expandIcon.classList.toggle('rotate-180');

@@ -18,13 +18,8 @@ $ npm run generate
 ```
 
 ## To start
-Be sure to create a .env file in the root directory with your github personal access token inside like so:
+Be sure to create a '.env' file in the root directory with your github personal access token inside like so:
 
-```javascript
-TOKEN=your_token_here
-```
-
-And don't forget to run:
 ```bash
-$ npm install dotenv
+TOKEN=your_token_here
 ```
