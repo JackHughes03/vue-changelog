@@ -1,5 +1,5 @@
 <template>
-    <Changelog-Layout />
+  <Changelog-Layout />
 </template>
 
 <script>
