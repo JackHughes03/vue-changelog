@@ -18,7 +18,8 @@ $ npm run generate
 ```
 
 ## To start
-Be sure to create a '.env' file in the root directory with your github personal access token inside like so:
+
+Be sure to create a '.env' file in the root directory with a github personal access token inside like so:
 
 ```bash
 TOKEN=your_token_here

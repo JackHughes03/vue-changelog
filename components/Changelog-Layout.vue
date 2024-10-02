@@ -8,7 +8,7 @@
                 </a>
                 
                 <a href="https://github.com/JackHughes03/vue-changelog/tree/main" target="_blank" rel="noopener noreferrer" class="text-blue-400 w-10">
-                    <img src="@/static/nav-icons/github.png" alt="">
+                    <img src="@/static/nav-icons/github.svg" alt="GitHub" class="size-5 invert">
                 </a>
             </nav>
         </header>
