@@ -11,5 +11,11 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ["@nuxt/eslint"]
+  modules: ["@nuxt/eslint"],
+
+  runtimeConfig: {
+    public: {
+      TOKEN: process.env.TOKEN
+    }
+  }
 });
