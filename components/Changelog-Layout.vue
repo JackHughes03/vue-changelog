@@ -149,14 +149,14 @@ fetchReleases("Non-stable");
 
       <Transition>
         <div v-if="toggleMenu"
-          class="top-13 absolute right-0 h-36 rounded-b border-[1px] border-t-0 border-white/10 bg-white/5 text-white">
+          class="top-[56px] absolute right-0 h-36 rounded-bl-xl border-[1px] border-t-0 border-r-0 border-white/20 bg-black text-white">
           <h3 class="border-b-[1px] border-white/20 px-8 py-1 text-sm">
             Theme
           </h3>
 
-          <div class="flex flex-col p-3 text-center">
+          <div class="flex flex-col p-3 gap-2 text-center">
             <button v-for="index in ['Dark', 'Light', 'System']" :key="index"
-              class="rounded px-2 py-1 text-sm opacity-50 duration-200 hover:bg-white/10 hover:opacity-100">
+              class="rounded px-2 py-0.5 text-sm opacity-50 duration-200 hover:bg-white/10 hover:opacity-100">
               {{ index }}
             </button>
           </div>
@@ -172,16 +172,16 @@ fetchReleases("Non-stable");
         </h1>
 
         <section
-          class="mt-10 inline-flex w-80 items-center justify-center gap-2 rounded bg-white/10 py-1 text-center text-sm text-white/60">
+          class="mt-6 md:mt-10 inline-flex w-[300px] items-center justify-center rounded bg-white/10 py-1 md:py-1 text-center text-sm text-white/60">
 
           <button v-for="index in ['Non-stable', 'Stable', 'Pre-releases']" :key="index"
-            :class="{ 'active-tab': activeTab === index }" class="rounded px-4 py-1.5 duration-200"
+            :class="{ 'active-tab': activeTab === index }" class="rounded px-4 py-0.5 md:py-1.5 duration-200"
             @click="handleClick(index)">
             {{ index }}
           </button>
         </section>
 
-        <section class="mt-10 w-full">
+        <section class="mt-6 md:mt-10 w-full">
           <div v-if="releases.length === 0" class="text-center text-white">
             <p class="loading-message">Loading...</p>
           </div>
