@@ -28,7 +28,7 @@ onMounted(fetchCommits);
 
   <div class="p-10">
     <header>
-      <h1 class="text-3xl text-white">
+      <h1 class="text-3xl text-white mt-12">
         <span class="text-green-400">Dev</span> log
       </h1>
     </header>
@@ -47,7 +47,8 @@ onMounted(fetchCommits);
           By {{ c.commit?.author?.name }} on {{ new Date(c.commit?.author?.date).toLocaleDateString() }}
         </div>
 
-        <a class="text-green-400/80 cursor-pointer underline text-sm" :href="c.html_url" target="_blank" rel="noopener noreferrer">
+        <a class="text-green-400/80 cursor-pointer underline text-sm" :href="c.html_url" target="_blank"
+          rel="noopener noreferrer">
           #{{ c.sha.slice(0, 7) }}
         </a>
       </li>

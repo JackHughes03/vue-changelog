@@ -85,17 +85,17 @@ function toggleExpanded(index) {
 }
 
 const sliderStyle = computed(() => {
-  const activeBtn = buttonRefs.value[activeIndex.value]
-  if (!activeBtn || !navContainer.value) return { left: 0, width: 0 }
+  const activeBtn = buttonRefs.value[activeIndex.value];
 
-  const left = activeBtn.offsetLeft
-  const width = activeBtn.offsetWidth
+  if (!activeBtn) return { left: 0, width: 0, opacity: 0 };
 
   return {
-    left: `${left}px`,
-    width: `${width}px`
-  }
-})
+    left: `${activeBtn.offsetLeft}px`,
+    width: `${activeBtn.offsetWidth}px`,
+    height: `${activeBtn.offsetHeight}px`,
+    opacity: 1
+  };
+});
 
 onMounted(() => {
   buttonRefs.value = buttonRefs.value.slice(0, tabs.length)
@@ -105,30 +105,31 @@ fetchReleases();
 
 <template>
   <section class="h-full">
-
     <main class="h-full p-10 text-white">
-      <section class="mx-auto flex max-w-4xl flex-col">
+      <section class="mx-auto mt-12 flex max-w-4xl flex-col">
         <header>
           <h1 class="text-3xl">
             <span class="text-green-400">Vue</span> releases
           </h1>
         </header>
 
-        <nav ref="navContainer" class="relative mt-6 flex w-fit items-center rounded-lg bg-white/10 p-1 md:mt-10"
-          aria-label="Release filters">
-          <div class="absolute h-[calc(100%-8px)] rounded-md bg-white/20 transition-all duration-300 ease-in-out"
-            :style="sliderStyle"></div>
+        <div class="p-0 flex items-center mt-6 w-full z-100 backdrop-blur-sm">
+          <nav ref="navContainer" aria-label="Release filters" class="relative flex items-center">
 
-          <button v-for="(tab, index) in tabs" :key="tab" :ref="(el) => (buttonRefs[index] = el)"
-            @click="activeIndex = index" :class="[
-              'relative z-10 px-4 py-1 text-sm font-medium transition-colors duration-300 whitespace-nowrap',
-              activeIndex === index ? 'text-white' : 'text-white/60 hover:text-white'
-            ]">
-            {{ tab }}
-          </button>
-        </nav>
+            <div class="absolute bg-white/10 rounded-md transition-all duration-300 ease-out" :style="sliderStyle">
+            </div>
 
-        <section class="mt-6 md:mt-10 w-full" aria-label="Release list">
+            <button v-for="(tab, index) in tabs" :key="tab" :ref="(el) => (buttonRefs[index] = el)"
+              @click="activeIndex = index" :class="[
+                'relative z-10 px-4 py-1.5 text-sm font-medium transition-colors duration-300 whitespace-nowrap cursor-pointer',
+                activeIndex === index ? 'text-white' : 'text-white/60 hover:text-white'
+              ]">
+              {{ tab }}
+            </button>
+          </nav>
+        </div>
+
+        <section class="mt-6 w-full" aria-label="Release list">
           <div v-if="releases.length === 0" class="text-center text-white" role="status">
             <p>Loading...</p>
           </div>
@@ -143,20 +144,6 @@ fetchReleases();
               <h2 class="text-base font-bold">{{ release.title }}</h2>
               <span class="text-xs opacity-50" aria-hidden="true">•</span>
               <time :datetime="release.date" class="text-sm opacity-50">{{ formatReleaseDate(release.date) }}</time>
-
-              <div class="flex gap-2">
-                <span v-for="cat in release.categories" :key="cat.type" class="border-[2px] rounded-full px-2 py-0.5"
-                  :class="{
-                    'bg-green-400/20 border-green-400 text-green-400': cat.type === 'Features',
-                    'bg-purple-400/20 border-purple-400 text-purple-400': cat.type === 'Bug Fixes',
-                    'bg-blue-400/20 border-blue-400 text-blue-400': cat.type === 'Reverts',
-                    'bg-yellow-400/20 border-yellow-400 text-yellow-400': cat.type === 'Performance Improvements',
-                  }">
-                  <strong class="font-bold text-xs block">
-                    {{ cat.type }}
-                  </strong>
-                </span>
-              </div>
 
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -196,7 +183,7 @@ fetchReleases();
 
 <style>
 :root {
-  background-color: rgb(0, 0, 0, 0.95);
+  background-color: rgb(0, 17, 4);
 }
 
 .v-enter-active,
