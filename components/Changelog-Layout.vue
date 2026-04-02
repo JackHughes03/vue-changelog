@@ -183,7 +183,7 @@ fetchReleases();
 
 <style>
 :root {
-  background-color: rgb(0, 17, 4);
+  background-color: rgb(0, 15, 0);
 }
 
 .v-enter-active,

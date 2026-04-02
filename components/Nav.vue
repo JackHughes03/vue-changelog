@@ -1,40 +1,63 @@
 <script setup>
-import { ref } from "vue";
-import Fuse from 'fuse.js';
+import { ref, onMounted } from "vue";
+import { Client, Account, OAuthProvider } from "appwrite";
+
+const client = new Client();
+client
+  .setEndpoint(import.meta.env.VITE_APPWRITE_ENDPOINT)
+  .setProject(import.meta.env.VITE_APPWRITE_PROJECT_ID);
+
+const account = new Account(client);
+
+const user = ref(null);
+
+const checkSession = async () => {
+  try {
+    user = await account.get()
+    updateUI()
+  } catch (error) {
+    if (error.code === 401) {
+      user = null
+    } else {
+      console.error('Session error:', error)
+    }
+    updateUI()
+  }
+}
+
+const loginWithGithub = async () => {
+  try {
+    await account.createOAuth2Session({
+      provider: OAuthProvider.Github,
+      success: 'http://localhost:3000/',
+      failure: 'http://localhost:3000/',
+    })
+  } catch (error) {
+    console.error('Login error:', error)
+  }
+}
+
+const logout = async () => {
+  try {
+    await account.deleteSession({ sessionId: 'current' })
+    user = null
+    updateUI()
+  } catch (error) {
+    console.error('Logout error:', error)
+  }
+}
+
+onMounted(() => {
+  checkSession();
+});
 
 const toggleMenu = ref(false);
-const activeIndex = ref(0)
-const tabs = ['Releases', 'Issues', 'Discussions']
-const buttonRefs = ref([])
-const navContainer = ref(null)
+const searchQuery = ref('');
 
 function toggleColourMode() {
   const icon = document.getElementById("triangle-icon");
-  icon.classList.toggle("rotate-180");
+  icon?.classList.toggle("rotate-180");
 }
-
-const sliderStyle = computed(() => {
-  const activeBtn = buttonRefs.value[activeIndex.value]
-  if (!activeBtn || !navContainer.value) return { left: 0, width: 0 }
-
-  const left = activeBtn.offsetLeft
-  const width = activeBtn.offsetWidth
-
-  return {
-    left: `${left}px`,
-    width: `${width}px`
-  }
-})
-
-const searchQuery = ref('');
-
-const handleSearch = () => {
-  if (searchQuery.value.trim()) {
-    alert(`You searched for: "${searchQuery.value}"`);
-
-    searchQuery.value = '';
-  }
-};
 </script>
 
 <template>
@@ -80,11 +103,13 @@ const handleSearch = () => {
         </div>
 
         <div class="flex gap-4">
-          <a class="w-10 text-blue-400 cursor-pointer" href="https://github.com/JackHughes03/vue-changelog"
-            target="_blank">
+          <button v-if="!user" class="w-10 text-blue-400 cursor-pointer login-btn" @click="loginWithGithub">
             <img src="@/static/nav-icons/github.svg" title="Github sign in icon" alt="GitHub sign in icon"
               class="size-5 invert" />
-          </a>
+          </button>
+          <button v-else @click="logout" class="text-xs font-medium text-white/70 hover:text-white transition-colors">
+            Logout
+          </button>
 
           <button @click="toggleColourMode(); toggleMenu = !toggleMenu;"
             class="flex cursor-pointer items-center justify-center">
@@ -103,7 +128,6 @@ const handleSearch = () => {
           </button>
         </div>
       </nav>
-
 
       <Transition>
         <div v-if="toggleMenu"

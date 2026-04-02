@@ -21,6 +21,4 @@ $ pnpm run generate
 
 Be sure to create a '.env' file in the root directory with a github personal access token inside like so:
 
-```bash
-TOKEN=your_token_here
-```
+[COMING SOON]
