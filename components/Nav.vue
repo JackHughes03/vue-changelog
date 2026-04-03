@@ -74,12 +74,12 @@ function toggleColourMode() {
         </a>
 
         <div class="w-full ml-10 text-sm flex gap-4">
-          <a href="/" class="text-white/50 hover:text-white transition-colors duration-200">
+          <NuxtLink to="/" class="text-white/50 hover:text-white transition-colors duration-200">
             Home
-          </a>
-          <a href="/devlog" class="text-white/50 hover:text-white transition-colors duration-200">
+          </NuxtLink>
+          <NuxtLink to="/devlog" class="text-white/50 hover:text-white transition-colors duration-200">
             Commits
-          </a>
+          </NuxtLink>
         </div>
 
         <div class="items-center mr-4 right-0 flex">

@@ -14,7 +14,7 @@ async function fetchReleases(chosenTab) {
   const issues = "https://api.github.com/repos/vuejs/core/issues?state=closed&per_page=10";
 
   try {
-    if (chosenTab === 1) {
+    if (chosenTab === 1) { // Issues
       const response = await fetch(issues);
       const issuesData = await response.json();
       releases.value = issuesData.map(issue => ({
@@ -24,11 +24,10 @@ async function fetchReleases(chosenTab) {
         expanded: false
       }));
     }
-    else if (chosenTab === 0) {
+    else if (chosenTab === 0) { // Releases
       const response = await fetch(stable);
       const markdown = await response.text();
-      // Improved parsing
-      releases.value = parseReleases(markdown).slice(0, 15); // Get latest 15
+      releases.value = parseReleases(markdown).slice(0, 15);
     }
   } catch (err) {
     console.error("Fetch error:", err);
@@ -37,7 +36,6 @@ async function fetchReleases(chosenTab) {
 
 function parseReleases(markdown) {
   const releases = [];
-  // Split by ## but keep the content
   const sections = markdown.split(/^##\s+/m).slice(1);
 
   for (const section of sections) {
@@ -45,14 +43,11 @@ function parseReleases(markdown) {
     const heading = lines[0].trim();
     const body = lines.slice(1).join('\n');
 
-    // Matches versions like [3.4.0] or 3.4.0
     const versionMatch = heading.match(/(\d+\.\d+\.\d+(?:-\w+\.\d+)?)/);
-    // Matches dates like (2024-03-24)
     const dateMatch = heading.match(/(\d{4}-\d{2}-\d{2})/);
 
     if (!versionMatch) continue;
 
-    // Split body by ### for Features, Bug Fixes, etc.
     const subSections = body.split(/^###\s+/m).slice(1);
     const categories = subSections.map(sub => {
       const subLines = sub.split('\n');
@@ -122,8 +117,8 @@ onMounted(() => {
         <header>
           <h1 class="text-3xl">
             <span class="text-green-400">Vue</span>
-            <span class="ml-2">
-              {{ activeIndex === 0 ? 'releases' : activeIndex === 1 ? 'issues' : 'discussions' }}
+            <span class="">
+              {{ activeIndex === 0 ? ' releases' : activeIndex === 1 ? ' issues' : 'discussions' }}
             </span>
           </h1>
         </header>
@@ -157,18 +152,26 @@ onMounted(() => {
             <button
               class="flex w-full cursor-pointer items-center gap-3 px-1 py-4 text-left appearance-none bg-transparent border-none"
               @click="toggleExpanded(index)" :aria-expanded="release.expanded">
-              <h2 class="text-base font-bold">{{ release.title }}</h2>
-              <span class="text-xs opacity-50" aria-hidden="true">•</span>
-              <time :datetime="release.date" class="text-sm opacity-50">{{ formatReleaseDate(release.date) }}</time>
+              <h2 v-if="release.title && release.title.length > 2" class="text-base font-bold break-words">
+                {{ release.expanded || release.title.length <= 40 ? release.title : release.title.slice(0, 40) + '...'
+                }} </h2>
+                  <span class="text-xs opacity-50" aria-hidden="true">•</span>
+                  <time :datetime="release.date" class="text-sm opacity-50">{{ formatReleaseDate(release.date) }}</time>
 
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="ml-auto h-4 w-4 transition-transform duration-300" :class="release.expanded ? 'rotate-180' : ''"
-                aria-hidden="true">
-                <path d="m6 9 6 6 6-6"></path>
-              </svg>
+                  <p v-if="index === 0"
+                    class="ml-3 flex items-center rounded-full border border-green-500/50 bg-green-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-green-400">
+                    Latest
+                  </p>
+
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="ml-auto h-4 w-4 transition-transform duration-300"
+                    :class="release.expanded ? 'rotate-180' : ''" aria-hidden="true">
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg>
             </button>
 
+            <!-- Content. Could probs do with better semantics -->
             <div class="grid transition-[grid-template-rows] duration-500 ease-in-out"
               :class="release.expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
               <div class="overflow-hidden">
