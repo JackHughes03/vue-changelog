@@ -3,69 +3,70 @@ import { ref } from "vue";
 import { marked } from 'marked';
 
 const releases = ref([]);
-const tabs = ['Releases', 'Issues', 'Discussions']
+const tabs = ['Releases', 'Issues']
 const activeIndex = ref(0)
 const buttonRefs = ref([])
-const navContainer = ref(null)
 
-async function fetchReleases() {
+async function fetchReleases(chosenTab) {
   releases.value = [];
 
-  // Below code only works for stable but there are plans to fetch issues and discussions in the future, so I've left it in for now.
-  const stable = "https://raw.githubusercontent.com/vuejs/core/refs/heads/main/CHANGELOG.md";
-  const issues = "https://api.github.com/repos/vuejs/core/issues?state=closed&per_page=5";
-  const discussions = "https://api.github.com/repos/vuejs/core/discussions?per_page=5";
-  const option = activeIndex.value === 0 ? stable : activeIndex.value === 1 ? issues : discussions;
+  const stable = "https://raw.githubusercontent.com/vuejs/core/main/CHANGELOG.md";
+  const issues = "https://api.github.com/repos/vuejs/core/issues?state=closed&per_page=10";
 
-  const response = await fetch(
-    option,
-    {
-      headers: {
-        Accept: activeIndex.value === 0 ? "text/plain" : "application/vnd.github.v3+json"
-      }
+  try {
+    if (chosenTab === 1) {
+      const response = await fetch(issues);
+      const issuesData = await response.json();
+      releases.value = issuesData.map(issue => ({
+        title: issue.title,
+        date: issue.closed_at,
+        categories: [{ type: 'Issue', content: marked(issue.body || '') }],
+        expanded: false
+      }));
     }
-  );
-
-  if (!response.ok) return;
-
-  const releasesData = parseReleases(await response.text());
-
-  releases.value = releasesData.map((releaseData) => ({
-    title: releaseData.version,
-    date: releaseData.date,
-    categories: releaseData.categories,
-    expanded: false
-  })).slice(0, -3); // Slicing off the last 3 as they were messy and not formatted
+    else if (chosenTab === 0) {
+      const response = await fetch(stable);
+      const markdown = await response.text();
+      // Improved parsing
+      releases.value = parseReleases(markdown).slice(0, 15); // Get latest 15
+    }
+  } catch (err) {
+    console.error("Fetch error:", err);
+  }
 }
 
 function parseReleases(markdown) {
   const releases = [];
-  const sections = markdown.split(/^## /m).slice(1);
+  // Split by ## but keep the content
+  const sections = markdown.split(/^##\s+/m).slice(1);
 
   for (const section of sections) {
     const lines = section.split('\n');
-    const heading = lines[0];
+    const heading = lines[0].trim();
     const body = lines.slice(1).join('\n');
 
-    const versionMatch = heading.match(/\[?([\d.]+(?:-\w+(?:\.\d+)?)?)\]?/);
-    const dateMatch = heading.match(/\((\d{4}-\d{2}-\d{2})\)/);
-    const subSections = body.split(/^### /m).slice(1);
+    // Matches versions like [3.4.0] or 3.4.0
+    const versionMatch = heading.match(/(\d+\.\d+\.\d+(?:-\w+\.\d+)?)/);
+    // Matches dates like (2024-03-24)
+    const dateMatch = heading.match(/(\d{4}-\d{2}-\d{2})/);
 
+    if (!versionMatch) continue;
+
+    // Split body by ### for Features, Bug Fixes, etc.
+    const subSections = body.split(/^###\s+/m).slice(1);
     const categories = subSections.map(sub => {
       const subLines = sub.split('\n');
-      const type = subLines[0].trim();
-      const content = subLines.slice(1).join('\n').trim();
-
       return {
-        type: type,
-        content: marked(content)
+        type: subLines[0].trim(),
+        content: marked(subLines.slice(1).join('\n').trim())
       };
     });
 
     releases.push({
-      version: versionMatch ? versionMatch[1] : 'Unknown',
-      date: dateMatch ? dateMatch[1] : 'N/A',
-      categories: categories
+      title: versionMatch[1],
+      date: dateMatch ? dateMatch[1] : new Date().toISOString(),
+      categories: categories,
+      expanded: false
     });
   }
   return releases;
@@ -97,10 +98,21 @@ const sliderStyle = computed(() => {
   };
 });
 
+const activateTab = (index) => {
+  activeIndex.value = index;
+
+  if (index === 0) {
+    fetchReleases(0);
+  } else if (index === 1) {
+    fetchReleases(1);
+  }
+}
+
 onMounted(() => {
   buttonRefs.value = buttonRefs.value.slice(0, tabs.length)
+
+  fetchReleases(0);
 })
-fetchReleases();
 </script>
 
 <template>
@@ -109,10 +121,14 @@ fetchReleases();
       <section class="mx-auto mt-12 flex max-w-4xl flex-col">
         <header>
           <h1 class="text-3xl">
-            <span class="text-green-400">Vue</span> releases
+            <span class="text-green-400">Vue</span>
+            <span class="ml-2">
+              {{ activeIndex === 0 ? 'releases' : activeIndex === 1 ? 'issues' : 'discussions' }}
+            </span>
           </h1>
         </header>
 
+        <!-- Release Filters -->
         <div class="p-0 flex items-center mt-6 w-full z-100 backdrop-blur-sm">
           <nav ref="navContainer" aria-label="Release filters" class="relative flex items-center">
 
@@ -120,7 +136,7 @@ fetchReleases();
             </div>
 
             <button v-for="(tab, index) in tabs" :key="tab" :ref="(el) => (buttonRefs[index] = el)"
-              @click="activeIndex = index" :class="[
+              @click="activateTab(index)" :class="[
                 'relative z-10 px-4 py-1.5 text-sm font-medium transition-colors duration-300 whitespace-nowrap cursor-pointer',
                 activeIndex === index ? 'text-white' : 'text-white/60 hover:text-white'
               ]">
